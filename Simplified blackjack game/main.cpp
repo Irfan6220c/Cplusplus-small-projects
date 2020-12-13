@@ -205,134 +205,110 @@ int  getCardValue(const Card &card)
 }
 
 
-void playBlackjack(array& Deck)
+int Deck_Index{ 0 };
+
+struct Player
 {
-    
+    int Total_Score{};
+    int Number_Cards{};
+}; 
 
-    array Player;
-    array Dealer;
-    std::string choice{};
-    int Player_Score{ 0 };
-    int Dealer_Score{ 0 };
-    int Deck_Index{ 0 };
-    int Player_Index{ 0 };
-    int Dealer_Index{ 0 };
+using string = std::string;
 
-    std::cout << "The dealer got the following cards:" << '\n';
-    for (int i = 0; i < 1; ++i)
+string choice;
+
+void Cal_Score(Player &Pl, array &Deck) {
+
+    for (int i = 0; i < Pl.Number_Cards; ++i)
     {
-        Dealer[i] = Deck[Deck_Index];
-        ++Dealer_Index;
-        ++Deck_Index;
+      Pl.Total_Score += getCardValue(Deck[Deck_Index]);
+      ++Deck_Index;
     }
+}
 
-    for (auto Element : Dealer)
+void  Player_turn(array &Deck, bool choice, Player &Player)
+{
+    if (choice)
     {
-        PrintCard(Element);
+        Cal_Score(Player, Deck);
     }
-
-
-    
-    std::cout << "The player got the following cards:" << '\n';
-    for (int i = 0; i < 2; ++i)
+    else if (choice == false)
     {
-        Player[Player_Index] = Deck[Deck_Index];
-        ++Deck_Index;
-        ++Player_Index;
-    }
-
-    for (auto Element:Player)
-    {
-        PrintCard(Element);
-    }
-    std::cout << "The player goes first: " << '\n';
-    //std::cout << "You can either stand or Hit. Choose (S/H): " << '\n';
-    do
-    {
-      std::cout << "You can either stand or Hit. Choose (S/H): " << '\n';
-      std::cin >> choice;
-    } while (choice!="S");
-
-    if (choice == "S")
-    {
-        std::cout << "Your turn is over with a total score of: " << '\n';
-        for (int i=0; i< Player_Index; ++i)
-        {
-            Player_Score+=getCardValue(Player[i]);
-        }
-        std::cout << Player_Score << '\n';
-    }
-
-    else if (choice == "H")
-    {
-
-        Player[Player_Index] = Deck[Deck_Index];
-        std::cout << "You got a new card: ";
-        PrintCard(Player[Player_Index]);
-        for (int i = 0; i <= Player_Index; ++i)
-        {
-            Player_Score += getCardValue(Player[i]);
-        }
-        ++Player_Index;
-        ++Deck_Index;
-        std::cout << Player_Score << '\n';
-    }
-    if (Player_Score >= 21)
-    {
-        std::cout << " You are busted and lost:" << '\n';
-    }
-
-    else if (Player_Score < 21)
-    {
-        do
-        {
-            std::cout << " Now the dealer goes after the player:" << '\n';
-            std::cout << " The dealer gets a new card and the card is:" << '\n';
-            Dealer[Dealer_Index] = Deck[Deck_Index];
-            PrintCard(Dealer[Dealer_Index]);
-            ++Dealer_Index;
-            ++Deck_Index;
-            std::cout << " The total score of the dealer is:" << '\n';
-            for (int i = 0; i < Dealer_Index; ++i)
-            {
-                Dealer_Score += getCardValue(Dealer[i]);
-            }
-            std::cout << Dealer_Score << '\n';
-
-        } while (Dealer_Score < 17);
-
-        if (Dealer_Score > 21)
-        {
-            std::cout << "The dealer lost" << '\n';
-        }
-        else if (Player_Score > Dealer_Score)
-        {
-            std::cout << " the player wins" << '\n';
-        }
-        else
-        {
-            std::cout << " the player loses" << '\n';
-        }
+        Cal_Score(Player,Deck);
     }
 }
 
 
+void Player_turn(Player &Player, array & Deck) {
+    std::cout << "The player goes first: " << '\n';
+    std::cout << "You can either stand or Hit. Choose (S/H): " << '\n';
+    std::cin >> choice;
+    if (choice == "S")
+    {
+        Cal_Score(Player, Deck);
 
-int main() 
+    }
+    else if (choice == "H")
+    {
+        Player.Number_Cards += 1;
+        Cal_Score(Player, Deck);
+    }
+    std::cout << " The total score of player is: " << Player.Total_Score << '\n';
+    
+}
+
+
+void Dealer_turn(Player &player,array &Deck) {
+    std::cout << " Now the dealer goes after the player" << '\n';
+    do
+    {
+        Cal_Score(player, Deck);
+    } while (player.Total_Score<=16);
+    std::cout << " The total score of dealer is: " << player.Total_Score << '\n';
+
+}
+
+bool score_compare(Player &PL1, Player &PL2) {
+    if (PL1.Total_Score>21)
+    {
+        return false;
+    }
+    else if (PL2.Total_Score>21)
+    {
+        return true;
+    }
+    else
+    {
+        return (PL1.Total_Score > PL2.Total_Score ? true : false);
+    }
+
+
+}
+
+int main()
 {
-
-
+    bool result;
     array Card_array;
-    Card_array=cardDeck();
+    Card_array = cardDeck();
     Card_array = shuffleDeck(Card_array);
     printDeck(Card_array);
-    /*Card card;
-    card.m_Rank = Rank_10;
-    card.m_Suits = Suits_Diamonds;*/
-    playBlackjack(Card_array);
- 
+    Player Dealer; // Initializing player dealer
+    Player Player; //Initializing player player
+    Dealer.Number_Cards = { 1 }; // Assigning Dealer 1 card
+    Player.Number_Cards = { 2 }; // Assigning Player 2 cards
+    Player_turn(Player, Card_array);
+    Dealer_turn(Dealer, Card_array);
 
+    result=score_compare(Player, Dealer);
 
+    if (result == true)
+    {
+        std::cout << "the player won:";
+    }
+    else
+    {
+        std::cout << "the dealer won:";
+    }
 
 
     return 0;

@@ -102,6 +102,13 @@ using namespace OIRFAN;
 		return *this;
 	}
 
+	template<typename T>
+	void OIRFAN::Matrix_Base_Class<T>::GetDimensions()
+	{
+		std::cout <<"Rows " <<m_Rows<< " "
+			"Columns "<<m_Columns<<'\n';
+	}
+
 
 
 	//Reset the data in matrix to zero// Not deleting it
@@ -185,5 +192,9 @@ using namespace OIRFAN;
 int main()
 {
 	using namespace OIRFAN;
+	Matrix_Base_Class<double> Array1(2, 2);
+	Array1.Preallocate();
+	Array1.GetDimensions();
+
 	return 0;
 }

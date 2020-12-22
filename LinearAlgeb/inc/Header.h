@@ -27,7 +27,7 @@ namespace OIRFAN {
 
 		template <typename T> 
 		friend std::ostream& operator<< (std::ostream& out, Matrix_Base_Class<T>& ClassObject);
-	public:
+	protected:
 
 		int   m_Rows{};
 		int   m_Columns{};
